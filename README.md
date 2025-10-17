@@ -81,6 +81,11 @@ Since pathpida >= `0.20.0` , removed Sapper support.
       <td>Specify the ignore pattern file path.</td>
     </tr>
     <tr>
+      <td nowrap><code>--ignoreAppSegments</code><br /><code>-i</code></td>
+      <td><code>string</code></td>
+      <td>Comma-separated list of folder names to skip in URL generation at any level of the app directory. The structure inside these folders will still be read and processed (e.g., <code>[locale]</code> for i18n routing handled by middleware).</td>
+    </tr>
+    <tr>
       <td nowrap><code>--output</code><br /><code>-o</code></td>
       <td><code>string</code></td>
       <td>Specify the output directory for <code>$path.ts</code>.</td>
@@ -115,6 +120,70 @@ Since pathpida >= `0.20.0` , removed Sapper support.
   }
 }
 ```
+
+### Ignoring App Router Segments
+
+If you're using Next.js 13+ app router with internationalization or other patterns where you want to skip specific folders in URL generation (like `[locale]`), you can use the `--ignoreAppSegments` flag. This will **read the structure inside these folders** but **skip them when building URLs**.
+
+This works at **any level** of your app directory structure, not just at the root.
+
+```json
+{
+  "scripts": {
+    "dev": "run-p dev:*",
+    "dev:next": "next dev",
+    "dev:path": "pathpida --ignoreAppSegments [locale] --watch",
+    "build": "pathpida --ignoreAppSegments [locale] && next build"
+  }
+}
+```
+
+You can ignore multiple segments by separating them with commas:
+
+```json
+{
+  "scripts": {
+    "dev:path": "pathpida --ignoreAppSegments [locale],[region] --watch"
+  }
+}
+```
+
+#### Example 1: Root-level locale
+
+```
+src/app/[locale]/dashboard/page.tsx
+src/app/[locale]/profile/page.tsx
+```
+
+The pages inside `[locale]` will be read, but the `[locale]` segment will be skipped:
+
+```typescript
+pagesPath.dashboard.$url(); // Generates { pathname: '/dashboard' }
+pagesPath.profile.$url(); // Generates { pathname: '/profile' }
+
+// Instead of:
+// pagesPath._locale('en').dashboard.$url() // Would generate { pathname: '/[locale]/dashboard', query: { locale: 'en' } }
+```
+
+#### Example 2: Nested locale (works at any level)
+
+```
+src/app/admin/[locale]/dashboard/page.tsx
+src/app/public/[locale]/help/page.tsx
+```
+
+With `--ignoreAppSegments [locale]`:
+
+```typescript
+pagesPath.admin.dashboard.$url(); // Generates { pathname: '/admin/dashboard' }
+pagesPath.public.help.$url(); // Generates { pathname: '/public/help' }
+```
+
+This is particularly useful when:
+
+- Your locale is handled by Next.js middleware and shouldn't be in the URL
+- You want to avoid extra redirects that impact performance
+- The dynamic segment is a routing implementation detail that shouldn't appear in your path helpers
 
 ## Usage
 

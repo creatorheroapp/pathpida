@@ -5,7 +5,7 @@ import path from 'path';
 
 export type Config = {
   input: string | undefined;
-  appDir: { input: string } | undefined;
+  appDir: { input: string; ignoreSegments?: string[] } | undefined;
   staticDir: string | undefined;
   output: string;
   ignorePath: string | undefined;
@@ -17,6 +17,7 @@ export default async (
   enableStatic: boolean,
   output: string | undefined,
   igPath: string | undefined,
+  ignoreAppSegments: string[] | undefined,
   dir = process.cwd(),
 ): Promise<Config> => {
   const ignorePath = igPath && path.join(dir, igPath);
@@ -61,7 +62,12 @@ export default async (
     staticDir: enableStatic ? path.posix.join(dir, 'public') : undefined,
     output: outDir,
     ignorePath,
-    appDir: isAppDirUsed ? { input: path.posix.join(srcDir, 'app') } : undefined,
+    appDir: isAppDirUsed
+      ? {
+          input: path.posix.join(srcDir, 'app'),
+          ...(ignoreAppSegments && { ignoreSegments: ignoreAppSegments }),
+        }
+      : undefined,
     pageExtensions: config.pageExtensions,
     basepath: config.basePath,
   };

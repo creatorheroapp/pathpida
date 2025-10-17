@@ -29,6 +29,7 @@ export const parseAppDir = (
   input: string,
   output: string,
   ignorePath: string | undefined,
+  ignoreSegments?: string[],
 ): { imports: string[]; text: string } => {
   const ig = createIg(ignorePath);
   const pageFileNames = ['page.tsx', 'page.jsx', 'page.js'];
@@ -63,6 +64,27 @@ export const parseAppDir = (
       .map((file) => {
         const newSlugs = [...slugs];
         const target = path.posix.join(targetDir, file);
+
+        const shouldIgnoreSegment = ignoreSegments && ignoreSegments.includes(file);
+
+        if (shouldIgnoreSegment) {
+          const indexFile = fs.readdirSync(target).find((name) => pageFileNames.includes(name));
+          return createPathObjString(
+            target,
+            parentIndent,
+            url,
+            newSlugs,
+            '<% props %>',
+            indexFile &&
+              createMethods(
+                parentIndent,
+                getImportName(path.posix.join(target, indexFile)),
+                newSlugs,
+                url || '/',
+              ),
+          );
+        }
+
         if (file.startsWith('(') && file.endsWith(')')) {
           const indexFile = fs.readdirSync(target).find((name) => pageFileNames.includes(name));
           return createPathObjString(

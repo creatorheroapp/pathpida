@@ -5,11 +5,11 @@ export const createNextTemplate = (
   input: string | undefined,
   output: string,
   ignorePath: string | undefined,
-  appDir: { input: string } | undefined,
+  appDir: { input: string; ignoreSegments?: string[] } | undefined,
   pageExtensions = ['tsx', 'ts', 'jsx', 'js'],
 ): string => {
   const appDirData = appDir
-    ? parseAppDir(appDir.input, output, ignorePath)
+    ? parseAppDir(appDir.input, output, ignorePath, appDir.ignoreSegments)
     : { imports: [], text: '' };
   const pagesDir = input
     ? parsePagesDir(input, output, ignorePath, pageExtensions)

@@ -28,6 +28,9 @@ describe('cli test', () => {
         project.enableStatic,
         project.output && path.join(workingDir, project.output),
         project.ignorePath,
+        project.ignoreAppSegments
+          ? project.ignoreAppSegments.split(',').map((s) => s.trim())
+          : undefined,
         workingDir,
       );
 

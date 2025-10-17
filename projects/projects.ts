@@ -14,25 +14,35 @@ export const projects = [
     output: string | undefined;
     enableStatic: boolean;
     ignorePath: string | undefined;
+    ignoreAppSegments: string | undefined;
   }[] => [
-    { ...project, output: undefined, enableStatic: true, ignorePath: undefined },
+    {
+      ...project,
+      output: undefined,
+      enableStatic: true,
+      ignorePath: undefined,
+      ignoreAppSegments: undefined,
+    },
     {
       ...project,
       output: `${project.output}/basic`,
       enableStatic: false,
       ignorePath: '.pathpidaignore',
+      ignoreAppSegments: undefined,
     },
     {
       ...project,
       output: `${project.output}/static`,
       enableStatic: true,
       ignorePath: undefined,
+      ignoreAppSegments: undefined,
     },
     {
       ...project,
       output: `${project.output}/ignore`,
       enableStatic: true,
       ignorePath: '.pathpidaignore',
+      ignoreAppSegments: undefined,
     },
   ],
 );
